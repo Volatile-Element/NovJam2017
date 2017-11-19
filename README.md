@@ -1,2 +1,2 @@
-# NovJam2017
-Repo for #NovJam2017 at the University of Lincoln.
+# GameJamTemplate
+A template to be used at the start of game jams.
