@@ -32,7 +32,7 @@ public class LandableBody : MonoBehaviour, IShipInteractable
 
     public void InteractionRangeEnter()
     {
-        FindObjectOfType<UIInteraction>().Show("Press 'L' to Land Ship");
+        FindObjectOfType<UIInteraction>().Show("Press 'F' to Land Ship");
     }
 
     public void InteractionRangeLeave()

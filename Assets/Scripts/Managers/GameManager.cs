@@ -31,8 +31,9 @@ public class GameManager : MonoBehaviour
             player.Ship.transform.position = player.PlanetPosition + player.Planet.GetComponentInChildren<LandableBody>().ShipLandingPoint;
             player.Player.transform.position = player.PlanetPosition + player.Planet.GetComponentInChildren<LandableBody>().ShipLandingPoint;
             player.Ship.ParentToGravity(player.Planet.GetComponent<Gravity>());
-            player.Ship.GetComponentInChildren<Camera>().gameObject.SetActive(false);
             player.Player.ParentToGravity(player.Planet.GetComponent<Gravity>());
+            player.Player.SetBeingControlled(true);
+            player.Ship.SetBeingControlled(false);
 
             players.Add(player.Player);
             planets.Add(player.Planet);

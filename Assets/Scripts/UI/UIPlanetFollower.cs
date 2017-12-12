@@ -24,7 +24,7 @@ public class UIPlanetFollower : MonoBehaviour
             var playerDistance = Vector3.Distance(player.transform.position, asteroid.Key.transform.position);
             var planetDistance = Vector3.Distance(planet.transform.position, asteroid.Key.transform.position);
 
-            var visible = asteroid.Key.GetComponent<Renderer>().isVisible;
+            var visible = asteroid.Key.GetComponentInChildren<Renderer>().isVisible;
 
             asteroid.Value.UpdateDistance(playerDistance, visible);
         }

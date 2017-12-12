@@ -4,8 +4,6 @@ using UnityEngine;
 
 public class Player : MonoBehaviour
 {
-    private Camera playerCamera;
-
     public bool BeingControlled;
 
     public Gravity parent;
@@ -21,29 +19,35 @@ public class Player : MonoBehaviour
     Vector3 moveAmount;
     Vector3 smoothMoveVelocity;
     float verticalLookRotation;
-    Transform cameraTransform;
     Rigidbody rigidbody;
 
     IPlayerInteractable interactableInRange;
 
     public GameObject BoosterPrefab;
+    public Animator Animator;
 
     private void Awake()
     {
         rigidbody = GetComponent<Rigidbody>();
-        rigidbody.constraints = RigidbodyConstraints.FreezeRotation;
+        Animator = GetComponentInChildren<Animator>();
 
-        playerCamera = GetComponentInChildren<Camera>();
-        cameraTransform = playerCamera.transform;
+        rigidbody.constraints = RigidbodyConstraints.FreezeRotation;
     }
 
 	private void FixedUpdate()
     {
+        if (!BeingControlled)
+        {
+            return;
+        }
+
         //Vector3 localMove = transform.TransformDirection(moveAmount) * Time.fixedDeltaTime;
         //rigidbody.MovePosition(rigidbody.position + localMove);
 
         float inputX = Input.GetAxisRaw("Horizontal");
         float inputY = Input.GetAxisRaw("Vertical");
+
+        Animator.SetBool("Walking", inputX != 0 || inputY != 0);
 
         transform.RotateAround(parent.transform.position, transform.forward, (-inputX) / parent.transform.Find("Model").localScale.x * 15f);
         transform.RotateAround(parent.transform.position, transform.right, (inputY) / parent.transform.Find("Model").localScale.x * 15f);
@@ -143,8 +147,12 @@ public class Player : MonoBehaviour
     {
         BeingControlled = state;
 
-        playerCamera.gameObject.SetActive(BeingControlled);
-        playerCamera.tag = BeingControlled ? "MainCamera" : "Untagged";
+        if (state)
+        {
+            Camera.main.GetComponent<FollowCameraWithAnchor>().SetInterests(transform.Find("Camera Target"), transform.Find("Camera Anchor"));
+            FindObjectOfType<Compass>().SetActivePlayer(transform);
+            FindObjectOfType<Line>().SetActivePlayer(transform);
+        }
     }
 
     private void OnTriggerEnter(Collider other)

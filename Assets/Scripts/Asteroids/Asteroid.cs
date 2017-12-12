@@ -32,9 +32,11 @@ public class Asteroid : MonoBehaviour
         if (planet != null)
         {
             GetComponent<Collider>().enabled = false;
-            planet.GetComponent<Health>().RemoveFromCurrentHealth(transform.localScale.x / 100);
+            planet.GetComponent<Health>().RemoveFromCurrentHealth(transform.Find("Model").localScale.x / 2);
 
             FindObjectOfType<AsteroidManager>().DestroyAsteroid(asteroid);
+
+            planet.KillOffPopulationPercentage(transform.Find("Model").localScale.x);
         }
 
         if (asteroid != null)

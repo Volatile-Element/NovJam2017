@@ -18,17 +18,43 @@ public class Ship : MonoBehaviour, IPlayerInteractable
     public Gravity parent;
     public Rigidbody rigidBody;
 
+    public GameObject ParticleEngine;
+    public GameObject StarField;
+
+    public AudioSource AudioSource;
+
     IShipInteractable interactableInRange;
 
     void Awake()
     {
         playerCamera = GetComponentInChildren<Camera>();
         rigidBody = GetComponent<Rigidbody>();
+        AudioSource = GetComponent<AudioSource>();
     }
 
     public void FixedUpdate()
     {
+        if (Input.GetKey(KeyCode.Q))
+        {
+            transform.Rotate(new Vector3(0, 0, 0.525f));
+        }
+
+        if (Input.GetKey(KeyCode.E))
+        {
+            transform.Rotate(new Vector3(0, 0, -0.525f));
+        }
+
         rigidBody.velocity = (transform.forward * CurrentThrottle);
+
+        if (rigidBody.velocity.magnitude >= 5 && !StarField.active)
+        {
+            StarField.SetActive(true);
+        }
+
+        if (rigidBody.velocity.magnitude < 5 && StarField.active)
+        {
+            StarField.SetActive(false);
+        }
     }
     
 	// Update is called once per frame
@@ -44,11 +70,11 @@ public class Ship : MonoBehaviour, IPlayerInteractable
 
     private void ProcessInput()
     {
-        if (Input.GetKeyDown(KeyCode.L) && interactableInRange != null)
+        if (Input.GetKeyDown(KeyCode.F) && interactableInRange != null)
         {
             interactableInRange.Interact();
         }
-
+        
         float inputX = Input.GetAxisRaw("Horizontal");
         float inputY = Input.GetAxisRaw("Vertical");
 
@@ -66,8 +92,20 @@ public class Ship : MonoBehaviour, IPlayerInteractable
     {
         BeingControlled = state;
 
-        playerCamera.gameObject.SetActive(BeingControlled);
-        playerCamera.tag = BeingControlled ? "MainCamera" : "Untagged";
+        ParticleEngine.SetActive(state);
+
+        if (state)
+        {
+            Camera.main.GetComponent<FollowCameraWithAnchor>().SetInterests(transform.Find("Camera Target"), transform.Find("Camera Anchor"));
+            FindObjectOfType<Compass>().SetActivePlayer(transform);
+            FindObjectOfType<Line>().SetActivePlayer(transform);
+
+            AudioSource.Play();
+        }
+        else
+        {
+            AudioSource.Stop();
+        }
     }
 
     public void ParentToGravity(Gravity gravity)
@@ -75,6 +113,7 @@ public class Ship : MonoBehaviour, IPlayerInteractable
         parent = gravity;
 
         rigidBody.isKinematic = true;
+        rigidBody.velocity = Vector3.zero;
         transform.parent = gravity.transform;
     }
 
